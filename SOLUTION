@@ -8,34 +8,38 @@ Default gateway IP
 10.0.0.1
 
 
-
 DHCP IP allocation sys-logs
 -------------------
-2024-05-22 16:53:09,192 - dhcp.py[DEBUG]: Performing a dhcp discovery on enX0
-2024-05-22 16:53:09,225 - subp.py[DEBUG]: Running command ['/usr/sbin/dhcpcd', '--ipv4only', '--waitip', '--persistent', '--noarp', '--script=/bin/true', 'enX0'] with allowed return codes [0] (shell=False, capture=True)
-2024-05-22 16:53:09,720 - subp.py[DEBUG]: command ['/usr/sbin/dhcpcd', '--ipv4only', '--waitip', '--persistent', '--noarp', '--script=/bin/true', 'enX0'] took 0.4s to run
-2024-05-22 16:53:09,720 - subp.py[DEBUG]: Running command ['/usr/sbin/dhcpcd', '--dumplease', '--ipv4only', 'enX0'] with allowed return codes [0] (shell=False, capture=True)
-2024-05-22 16:53:09,725 - dhcp.py[DEBUG]: Parsing dhcpcd lease for interface enX0: 'reason=BOUND\ninterface=enX0\nprotocol=dhcp\nip_address=10.0.0.223\nsubnet_cidr=24\nnetwork_number=10.0.0.0\nsubnet_mask=255.255.255.0\nrouters=10.0.0.1\ndomain_name_servers=10.0.0.2\nhost_name=ip-10-0-0-223\ndomain_name=us-east-2.compute.internal\ninterface_mtu=9001\nbroadcast_address=10.0.0.255\ndhcp_lease_time=3600\ndhcp_message_type=5\ndhcp_server_identifier=10.0.0.1\ndhcp_renewal_time=1800\ndhcp_rebinding_time=3150\n'
+Discover:
+2024-05-26T14:21:35.129066+00:00 ip-10-0-0-10 dhcpcd[432]: enX0: soliciting a DHCP lease
 
+Offer:
+2024-05-26T14:21:35.129069+00:00 ip-10-0-0-10 dhcpcd[432]: enX0: offered 10.0.0.10 from 10.0.0.1
+
+Request:
+2024-05-26T14:21:35.129075+00:00 ip-10-0-0-10 dhcpcd[432]: enX0: leased 10.0.0.10 for 3600 seconds
+
+Acknowledge:
+2024-05-27T15:34:42.613995+00:00 ip-10-0-0-10 dhcpcd[433]: enX0: adding route to 10.0.0.0/24
+2024-05-27T15:34:42.613999+00:00 ip-10-0-0-10 dhcpcd[433]: enX0: adding default route via 10.0.0.1
+2024-05-27T15:34:42.614005+00:00 ip-10-0-0-10 dhcpcd[433]: control command: /usr/sbin/dhcpcd --dumplease --ipv4only enX0
+2024-05-27T15:34:42.614079+00:00 ip-10-0-0-10 systemd-networkd[453]: enX0: DHCPv4 address 10.0.0.10/24, gateway 10.0.0.1 acquired from 10.0.0.1
 
 
 
 Public to private num of hops
 -------------------
- 1  10.0.1.205 (10.0.1.205)  1.243 ms  1.235 ms  1.232 ms
-Both instances are in the same VPC but different subnets. They are connected to the same public route table, which allows direct routing between subnets.
+hop count of 1 while there are 30 as a limit hops.
+It implies that the packet is sent directly from the source to the destination without traversing any routers in between.
+thus because both are in the same VPC but in different subnets.
+
 
 DNS queries from the private instance
 -------------------
-Yes, because AWS VPC provides a built-in DNS resolver for instances launched within the VPC. This DNS resolver is accessible at the IP address 169.254.169.253 or via the link-local address 127.0.0.53.
-And its used here:
-ubuntu@ip-10-0-1-205:~$ nslookup www.google.com
-Server:		127.0.0.53
-Address:	127.0.0.53#53
-
-Non-authoritative answer:
-Name:	www.google.com
-Address: 142.250.191.100
-Name:	www.google.com
-Address: 2607:f8b0:4009:817::2004
-#
+Yes.
+As we learned we can use 'dig' to query the DNS server for the public website's domain name.
+This means connecting to the private instance via the public instance, I can configure the private instance to use
+the public instance as a DNS resolver. This allows the private instance to leverage the public instance's internet
+access and connectivity to public DNS servers.
+Note that the web cannot be opened just I can show its ip and other proprieties (because I dont have a direct connection
+for the Internet from private).
