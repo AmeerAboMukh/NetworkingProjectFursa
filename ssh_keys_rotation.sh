@@ -7,7 +7,7 @@ if [ $# -ne 1 ]; then
 fi
 
 PRIVATE_IP=$1
-KEY_PATH="/home/ubuntu/new_key_path.pem"
+KEY_PATH="/home/ubuntu/ameerKey.pem"
 
 # Check if the key file exists
 if [ ! -f "$KEY_PATH" ]; then
