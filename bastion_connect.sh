@@ -18,7 +18,7 @@ PRIVATE_IP=$2
 COMMAND=$3
 
 # Define the path to the new key file on the bastion host
-NEW_KEY_PATH_PEM="/home/ubuntu/new_key_path.pem"
+NEW_KEY_PATH_PEM="/home/ubuntu/ameerKey.pem"
 
 # Check if the new key file exists on the bastion host
 ssh -i "$KEY_PATH" ubuntu@$PUBLIC_IP "test -f $NEW_KEY_PATH_PEM"
@@ -32,7 +32,7 @@ fi
 # 2. Connect to the private instance from your local machine
 # 3. Connect to the public instance
 if [ -n "$PRIVATE_IP" ] && [ -n "$COMMAND" ]; then
-        ssh -t -i "$KEY_PATH" ubuntu@"$PUBLIC_IP" "ssh -t -i $NEW_KEY_PATH_FILE ubuntu@$PRIVATE_IP '$COMMAND'"
+        ssh -t -i "$KEY_PATH" ubuntu@"$PUBLIC_IP" "ssh -t -i $NEW_KEY_PATH_PEM ubuntu@$PRIVATE_IP '$COMMAND'"
 elif [ -n "$PRIVATE_IP" ]; then
         ssh -t -i "$KEY_PATH" ubuntu@"$PUBLIC_IP" "ssh -t -i $NEW_KEY_PATH_PEM ubuntu@$PRIVATE_IP"
 else
