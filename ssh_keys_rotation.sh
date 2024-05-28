@@ -9,6 +9,18 @@ fi
 PRIVATE_IP=$1
 KEY_PATH="/home/ubuntu/ameerKey.pem"
 
+# Check if the key file exists
+if [ ! -f "$KEY_PATH" ]; then
+    echo "The key file at KEY_PATH does not exist. Please check the path and try again."
+    exit 2
+fi
+
+# Check if the key at KEY_PATH can connect to the private instance
+if ! ssh -i "$KEY_PATH" -o "StrictHostKeyChecking=no" -o "BatchMode=yes" ubuntu@$PRIVATE_IP "exit"; then
+    echo "The key at KEY_PATH cannot connect to the private instance. Check the key and its permissions."
+    exit 3
+fi
+
 # Generate a new key pair
 NEW_KEY_PATH="/home/ubuntu/new_key"
 
